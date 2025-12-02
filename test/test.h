@@ -6,6 +6,8 @@
 #include <string>
 #include <functional>
 #include <sstream>
+#include <exception>
+#include <typeinfo>
 
 namespace SimpleTest {
 
@@ -86,6 +88,42 @@ void assert_eq(const T& expected, const U& actual, const char* file, int line) {
     }
 }
 
+template<typename T, typename U>
+void assert_gt(const T& lhs, const U& rhs, const char* file, int line) {
+    if (!(lhs > rhs)) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Assertion failed: " << lhs << " > " << rhs;
+        throw AssertionError(oss.str());
+    }
+}
+
+template<typename T, typename U>
+void assert_lt(const T& lhs, const U& rhs, const char* file, int line) {
+    if (!(lhs < rhs)) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Assertion failed: " << lhs << " < " << rhs;
+        throw AssertionError(oss.str());
+    }
+}
+
+template<typename T, typename U>
+void assert_gteq(const T& lhs, const U& rhs, const char* file, int line) {
+    if (!(lhs >= rhs)) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Assertion failed: " << lhs << " >= " << rhs;
+        throw AssertionError(oss.str());
+    }
+}
+
+template<typename T, typename U>
+void assert_lteq(const T& lhs, const U& rhs, const char* file, int line) {
+    if (!(lhs <= rhs)) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Assertion failed: " << lhs << " <= " << rhs;
+        throw AssertionError(oss.str());
+    }
+}
+
 template<typename T>
 void assert_true(const T& condition, const char* file, int line) {
     if (!condition) {
@@ -104,6 +142,27 @@ void assert_false(const T& condition, const char* file, int line) {
     }
 }
 
+template<typename ExceptionType, typename Callable>
+void assert_throws(Callable func, const char* file, int line) {
+    try {
+        func();
+    } catch (const ExceptionType&) {
+        return; // Test passes if the correct exception is thrown
+    } catch (const std::exception& e) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Expected exception of type " << typeid(ExceptionType).name() << ", but got " << typeid(e).name();
+        throw AssertionError(oss.str());
+    } catch (...) {
+        std::ostringstream oss;
+        oss << file << ":" << line << ": Expected exception of type " << typeid(ExceptionType).name() << ", but got an unknown exception type.";
+        throw AssertionError(oss.str());
+    }
+
+    std::ostringstream oss;
+    oss << file << ":" << line << ": Expected exception of type " << typeid(ExceptionType).name() << ", but no exception was thrown.";
+    throw AssertionError(oss.str());
+}
+
 } // namespace SimpleTest
 
 // Macros for easy test definition
@@ -115,11 +174,26 @@ void assert_false(const T& condition, const char* file, int line) {
 #define ASSERT_EQ(expected, actual) \
     SimpleTest::assert_eq(expected, actual, __FILE__, __LINE__)
 
+#define ASSERT_GT(lhs, rhs) \
+    SimpleTest::assert_gt(lhs, rhs, __FILE__, __LINE__)
+
+#define ASSERT_LT(lhs, rhs) \
+    SimpleTest::assert_lt(lhs, rhs, __FILE__, __LINE__)
+
+#define ASSERT_GTEQ(lhs, rhs) \
+    SimpleTest::assert_gteq(lhs, rhs, __FILE__, __LINE__)
+
+#define ASSERT_LTEQ(lhs, rhs) \
+    SimpleTest::assert_lteq(lhs, rhs, __FILE__, __LINE__)
+
 #define ASSERT_TRUE(condition) \
     SimpleTest::assert_true(condition, __FILE__, __LINE__)
 
 #define ASSERT_FALSE(condition) \
     SimpleTest::assert_false(condition, __FILE__, __LINE__)
+
+#define ASSERT_THROWS(exception_type, func) \
+    SimpleTest::assert_throws<exception_type>(func, __FILE__, __LINE__)
 
 #define RUN_ALL_TESTS() \
     SimpleTest::TestRegistry::instance().run()
@@ -136,14 +210,15 @@ void assert_false(const T& condition, const char* file, int line) {
  *     ASSERT_EQ(4, 2 + 2);
  * }
  * 
- * TEST(strings_concatenate) {
- *     std::string result = std::string("Hello") + " World";
- *     ASSERT_EQ(std::string("Hello World"), result);
+ * TEST(comparisons) {
+ *     ASSERT_GT(5, 3);
+ *     ASSERT_LT(3, 5);
+ *     ASSERT_GTEQ(5, 5);
+ *     ASSERT_LTEQ(3, 3);
  * }
  * 
- * TEST(boolean_logic) {
- *     ASSERT_TRUE(5 > 3);
- *     ASSERT_FALSE(2 > 10);
+ * TEST(exception_test) {
+ *     ASSERT_THROWS(std::runtime_error, []() { throw std::runtime_error("Error"); });
  * }
  * 
  * int main() {

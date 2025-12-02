@@ -3,27 +3,30 @@
 
 int Board::compareRow(std::string position, std::string targetRow)
 {
-    if (position.length() < 2 || targetRow.length() < 1)
+    if (targetRow.length() < 1)
     {
         throw std::invalid_argument("Invalid position or target row format");
     }
 
-    int posRow = position[1] - '0';
     int target = targetRow[0] - '0';
-
-    if (posRow <= 0 || posRow > 8)
-    {
-        throw std::invalid_argument("Invalid position row");
-    }
+    
     if (target <= 0 || target > 8)
     {
         throw std::invalid_argument("Invalid target row");
     }
-    return posRow - target;
+    return compareRow(position, target);
 }
 int Board::compareRow(std::string position, int targetRow)
 {
-    return 0;
+    if(position.length() < 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
+    int posRow = position[1] - '0';
+    if (posRow <= 0 || posRow > 8)
+    {
+        throw std::invalid_argument("Invalid position row");
+    }
+    return posRow - targetRow;
 }
 std::vector<std::string> Board::generateMoves()
 {
