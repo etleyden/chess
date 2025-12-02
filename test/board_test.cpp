@@ -102,13 +102,18 @@ TEST(initialize_board) {
     std::string expectedBoard =
         "rnbqkbnr\n"
         "pppppppp\n"
-        "#.#.#.#.\n"
-        ".#.#.#.#\n"
-        "#.#.#.#.\n"
-        ".#.#.#.#\n"
+        "X X X X \n"
+        " X X X X\n"
+        "X X X X \n"
+        " X X X X\n"
         "PPPPPPPP\n"
         "RNBQKBNR\n";
     ASSERT_EQ(expectedBoard, board.boardToString());
+}
+TEST(generateFEN_initial_board) {
+    Board board;
+    std::string expectedFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
+    ASSERT_EQ(expectedFEN, board.generateFEN());
 }
 int main() {
     return RUN_ALL_TESTS();

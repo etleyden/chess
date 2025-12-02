@@ -16,13 +16,13 @@ class Board {
     uint64_t whitePawns;
     uint64_t whiteKnights;
     uint64_t whiteBishops;
-    uint64_t whiteRooks; // Bitboard for white rooks
+    uint64_t whiteRooks; 
     uint64_t whiteQueens;
     uint64_t whiteKing;
     uint64_t blackPawns;
     uint64_t blackKnights;
     uint64_t blackBishops;
-    uint64_t blackRooks; // Bitboard for black rooks
+    uint64_t blackRooks; 
     uint64_t blackQueens;
     uint64_t blackKing;
     // special rules
@@ -81,4 +81,13 @@ class Board {
      * @return std::string The string representation of the board.
      */
     std::string boardToString() const;
+
+    /**
+     * @brief Generates the FEN representation of the current board state.
+     * 
+     * Read more: https://www.chess.com/terms/fen-chess
+     * 
+     * @return std::string The FEN string representing the board.
+     */
+    std::string generateFEN() const;
 };
