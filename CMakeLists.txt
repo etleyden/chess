@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Add source files
 set(SRC_FILES
     src/board/board.cpp
-    src/board/pawn.cpp
 )
 
 # Add library target

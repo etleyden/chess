@@ -97,6 +97,19 @@ TEST(compareColumn_int_invalid_target_low) {
         Board::compareColumn("e4", 0);
     });
 }
+TEST(initialize_board) {
+    Board board;
+    std::string expectedBoard =
+        "rnbqkbnr\n"
+        "pppppppp\n"
+        "#.#.#.#.\n"
+        ".#.#.#.#\n"
+        "#.#.#.#.\n"
+        ".#.#.#.#\n"
+        "PPPPPPPP\n"
+        "RNBQKBNR\n";
+    ASSERT_EQ(expectedBoard, board.boardToString());
+}
 int main() {
     return RUN_ALL_TESTS();
 }

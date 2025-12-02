@@ -16,11 +16,13 @@ class Board {
     uint64_t whitePawns;
     uint64_t whiteKnights;
     uint64_t whiteBishops;
+    uint64_t whiteRooks; // Bitboard for white rooks
     uint64_t whiteQueens;
     uint64_t whiteKing;
     uint64_t blackPawns;
     uint64_t blackKnights;
     uint64_t blackBishops;
+    uint64_t blackRooks; // Bitboard for black rooks
     uint64_t blackQueens;
     uint64_t blackKing;
     // special rules
@@ -58,4 +60,25 @@ class Board {
      */
     static int compareColumn(std::string position, char targetColumn);
     static int compareColumn(std::string position, int targetColumn);
+
+    /**
+     * @brief Constructs a new Board object with all pieces in their initial positions.
+     * 
+     * Initializes the board with white and black pieces in their starting positions,
+     * sets the turn to white, enables castling rights, and sets no en passant square.
+     */
+    Board();
+
+    /**
+     * @brief Generates a string representation of the current board state.
+     * 
+     * Uses the following characters to represent the board:
+     * - Empty dark space: '_'
+     * - Empty light space: 'O'
+     * - White pieces: uppercase (P, N, B, R, Q, K)
+     * - Black pieces: lowercase (p, n, b, r, q, k)
+     * 
+     * @return std::string The string representation of the board.
+     */
+    std::string boardToString() const;
 };
