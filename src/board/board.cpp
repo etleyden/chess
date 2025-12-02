@@ -28,9 +28,46 @@ int Board::compareRow(std::string position, int targetRow)
     }
     return posRow - targetRow;
 }
-std::vector<std::string> Board::generateMoves()
+int Board::compareColumn(std::string position, char targetColumn)
 {
-    return {};
+    if (position.length() < 1)
+    {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    char posColumn = position[0];
+
+    if (posColumn < 'a' || posColumn > 'h')
+    {
+        throw std::invalid_argument("Invalid position column");
+    }
+    if (targetColumn < 'a' || targetColumn > 'h')
+    {
+        throw std::invalid_argument("Invalid target column");
+    }
+
+    return posColumn - targetColumn;
+}
+
+int Board::compareColumn(std::string position, int targetColumn)
+{
+    if (position.length() < 1)
+    {
+        throw std::invalid_argument("Invalid position format");
+    }
+
+    char posColumn = position[0];
+
+    if (posColumn < 'a' || posColumn > 'h')
+    {
+        throw std::invalid_argument("Invalid position column");
+    }
+    if (targetColumn < 1 || targetColumn > 8)
+    {
+        throw std::invalid_argument("Invalid target column");
+    }
+
+    return (posColumn - 'a' + 1) - targetColumn;
 }
 /**
  * === REQUIREMENTS ===
