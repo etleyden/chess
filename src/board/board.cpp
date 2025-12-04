@@ -21,6 +21,28 @@ Board::Board()
     // Constructor body can remain empty as initialization is done in the initializer list
 }
 
+/**
+ * === REQUIREMENTS ===
+ * Move Handling Requirements
+ * move(move: string)
+ * 1. A move must be supported by a string containing the start position of a piece,
+ *    and the end position of a piece (for example "g1 g3" will move the white knight
+ *    from it's intital position)
+ * 2. A call to the move function must throw an error if the move is invalid
+ * 3. The board state must be updated for the instance of the board object after the
+ *    valid move function
+ * Move generation requirements
+ * generateMoves(pieceAtPosition?: string)
+ * 1. Calling the function with no input will return a list of ALL valid moves.
+ * 2. Calling the function with a string input for a piece position will return a
+ *    list of valid moves for that piece
+ * === Notes ===
+ * Need a function to suggest moves. This could double as the function
+ * used to play against a computer
+ */
+// === Pieces and movement ===
+
+// === Basic Board Utilities ===
 int Board::compareRow(std::string position, std::string targetRow)
 {
     if (targetRow.length() < 1)
@@ -68,7 +90,6 @@ int Board::compareColumn(std::string position, char targetColumn)
 
     return posColumn - targetColumn;
 }
-
 int Board::compareColumn(std::string position, int targetColumn)
 {
     if (position.length() < 1)
@@ -89,7 +110,60 @@ int Board::compareColumn(std::string position, int targetColumn)
 
     return (posColumn - 'a' + 1) - targetColumn;
 }
+// === Bitmask Utils ===
+uint64_t Board::getBitmaskForPosition(std::string position)
+{
+    if (position.length() < 2) {
+        throw std::invalid_argument("Invalid position format");
+    }
 
+    char file = position[0];
+    char rank = position[1];
+
+    if (file < 'a' || file > 'h' || rank < '1' || rank > '8') {
+        throw std::invalid_argument("Position out of bounds");
+    }
+
+    int fileIndex = file - 'a';
+    int rankIndex = rank - '1';
+
+    return 1ULL << (rankIndex * 8 + fileIndex);
+}
+uint64_t Board::getBitmaskForRow(int row)
+{
+    if (row < 1 || row > 8) {
+        throw std::invalid_argument("Row out of bounds");
+    }
+
+    return 0xFFULL << ((row - 1) * 8);
+}
+uint64_t Board::getBitmaskForColumn(char column)
+{
+    if (column < 'a' || column > 'h') {
+        throw std::invalid_argument("Column out of bounds");
+    }
+
+    uint64_t bitmask = 0;
+    int colIndex = column - 'a';
+
+    return getBitmaskForColumn(colIndex + 1);
+}
+uint64_t Board::getBitmaskForColumn(int column)
+{
+    if (column < 1 || column > 8) {
+        throw std::invalid_argument("Column out of bounds");
+    }
+
+    uint64_t bitmask = 0;
+    int colIndex = column - 1;
+
+    for (int row = 0; row < 8; ++row) {
+        bitmask |= (1ULL << (row * 8 + colIndex));
+    }
+
+    return bitmask;
+}
+// === Board Representation ===
 std::string Board::boardToString() const
 {
     std::string boardRepresentation;
@@ -134,27 +208,6 @@ std::string Board::boardToString() const
     }
     return boardRepresentation;
 }
-
-/**
- * === REQUIREMENTS ===
- * Move Handling Requirements
- * move(move: string)
- * 1. A move must be supported by a string containing the start position of a piece,
- *    and the end position of a piece (for example "g1 g3" will move the white knight
- *    from it's intital position)
- * 2. A call to the move function must throw an error if the move is invalid
- * 3. The board state must be updated for the instance of the board object after the
- *    valid move function
- * Move generation requirements
- * generateMoves(pieceAtPosition?: string)
- * 1. Calling the function with no input will return a list of ALL valid moves.
- * 2. Calling the function with a string input for a piece position will return a
- *    list of valid moves for that piece
- * === Notes ===
- * Need a function to suggest moves. This could double as the function
- * used to play against a computer
- */
-
 std::string Board::generateFEN() const {
     std::string fen;
     for (int rank = 7; rank >= 0; --rank) {

@@ -26,17 +26,18 @@ class Board {
     uint64_t blackQueens;
     uint64_t blackKing;
     // special rules
-    /**
-     * @brief Indicates whether it is white's turn.
-     */
-    bool whiteTurn;
-    /**
-     * @brief Indicates whether castling is allowed.
-     */
+    bool whiteTurn; // is it white's turn?
     int castlingRights;  // can anyone castle?
     int enPassantSquare; // which squares are valid en passant squares
 
-    public: 
+    public:  
+    /**
+     * @brief Constructs a new Board object with all pieces in their initial positions.
+     * 
+     * Initializes the board with white and black pieces in their starting positions,
+     * sets the turn to white, enables castling rights, and sets no en passant square.
+     */
+    Board();
     /**
      * @brief Compares two rows on the chessboard.
      * 
@@ -61,13 +62,6 @@ class Board {
     static int compareColumn(std::string position, char targetColumn);
     static int compareColumn(std::string position, int targetColumn);
 
-    /**
-     * @brief Constructs a new Board object with all pieces in their initial positions.
-     * 
-     * Initializes the board with white and black pieces in their starting positions,
-     * sets the turn to white, enables castling rights, and sets no en passant square.
-     */
-    Board();
 
     /**
      * @brief Generates a string representation of the current board state.
@@ -81,7 +75,6 @@ class Board {
      * @return std::string The string representation of the board.
      */
     std::string boardToString() const;
-
     /**
      * @brief Generates the FEN representation of the current board state.
      * 
@@ -90,4 +83,10 @@ class Board {
      * @return std::string The FEN string representing the board.
      */
     std::string generateFEN() const;
+    private:
+    // bitmask utility functions    
+    uint64_t getBitmaskForPosition(std::string position);
+    uint64_t getBitmaskForRow(int row);
+    uint64_t getBitmaskForColumn(char column);
+    uint64_t getBitmaskForColumn(int column);
 };
