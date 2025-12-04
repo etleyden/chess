@@ -42,6 +42,10 @@ class Board {
     Board();
     Piece getPieceAtPosition(std::string position);
     /**
+     * @brief Returns a bitmask representing which squares are occupied on the board.
+     */
+    uint64_t getBitmaskForBoard();
+    /**
      * @brief Returns the current turn. True for white's turn, false for black.
      */
     bool getTurn();

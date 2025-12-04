@@ -17,12 +17,13 @@
 |**Install the library \[untested\]:** | `cmake --install build --prefix /usr/local`|
 |**Clean up build artifacts:** | `cmake --build build --target clean`|
 
-## Implementation Plan
+## Current Implementation Plan
 
-1. Board Representation/Tests
-
-    a. Determine interface for representing the board, with pieces.
-
-    b. Write [Perft](https://www.chessprogramming.org/Perft) tests using that interface
-
-    c. Implement the logic behind the interface.
+- Initialize the Board from FEN notation
+- Write tests for FEN notation -> board
+- Write tests for movement generators for each piece. This will use the FEN notation board generation. (mock underlying logic)
+- Write movement generators. Movement generators must come in two varieties: a. return a bitmask of valid moves, b. return a string list of valid moves (i.e. "e1 e4")
+- Write Perft tests
+- Implement text-based gameplay interface
+- Implement graphical gameplay interface
+- Other cool stuff probably
