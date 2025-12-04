@@ -115,6 +115,21 @@ TEST(generateFEN_initial_board) {
     std::string expectedFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -";
     ASSERT_EQ(expectedFEN, board.generateFEN());
 }
+TEST(getPieceAtPosition_initial_positions) {
+    Board board;
+    ASSERT_EQ(Board::Piece::WHITE_PAWN, board.getPieceAtPosition("a2"));
+    ASSERT_EQ(Board::Piece::WHITE_KNIGHT, board.getPieceAtPosition("b1"));
+    ASSERT_EQ(Board::Piece::WHITE_BISHOP, board.getPieceAtPosition("c1"));
+    ASSERT_EQ(Board::Piece::WHITE_ROOK, board.getPieceAtPosition("a1"));
+    ASSERT_EQ(Board::Piece::WHITE_QUEEN, board.getPieceAtPosition("d1"));
+    ASSERT_EQ(Board::Piece::WHITE_KING, board.getPieceAtPosition("e1"));
+    ASSERT_EQ(Board::Piece::BLACK_PAWN, board.getPieceAtPosition("a7"));
+    ASSERT_EQ(Board::Piece::BLACK_KNIGHT, board.getPieceAtPosition("b8"));
+    ASSERT_EQ(Board::Piece::BLACK_BISHOP, board.getPieceAtPosition("c8"));
+    ASSERT_EQ(Board::Piece::BLACK_ROOK, board.getPieceAtPosition("a8"));
+    ASSERT_EQ(Board::Piece::BLACK_QUEEN, board.getPieceAtPosition("d8"));
+    ASSERT_EQ(Board::Piece::BLACK_KING, board.getPieceAtPosition("e8"));
+}
 int main() {
     return RUN_ALL_TESTS();
 }

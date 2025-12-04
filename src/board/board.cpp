@@ -43,14 +43,91 @@ Board::Board()
  * used to play against a computer
  */
 // === Pieces and movement ===
+Board::Piece Board::getPieceAtPosition(std::string position)
+{
+    uint64_t bitmask = getBitmaskForPosition(position);
+    for (int i = 0; i < 12; ++i) {
+        if (pieces[i] & bitmask) {
+            return static_cast<Piece>(i);
+        }
+    }
+    throw std::invalid_argument("No piece at the given position");
+}
+bool Board::getTurn()
+{
+    return whiteTurn;
+}
 uint64_t Board::getMovesForPieceAtPosition(std::string position)
 {
-
     // design requirements:
     // a) validate position input
+    if(getBitmaskForPosition(position) == 0) {
+        throw std::invalid_argument("Invalid position format");
+    }
     // b) identify piece at position
+    Piece piece = getPieceAtPosition(position);
     // c) if it is not their turn, throw an error
+    if ((whiteTurn && piece >= BLACK_PAWN) || (!whiteTurn && piece <= WHITE_KING)) {
+        throw std::invalid_argument("It's not that player's turn");
+    }
     // d) generate valid moves for that piece based on current board state and store it in a bitmask
+    switch(piece) {
+        case WHITE_PAWN:
+        case BLACK_PAWN:
+            return getMovesForPawnAtPosition(position);
+            break;
+        case WHITE_KNIGHT:
+        case BLACK_KNIGHT:
+            return getMovesForKnightAtPosition(position);
+            break;
+        case WHITE_BISHOP:
+        case BLACK_BISHOP:
+            return getMovesForBishopAtPosition(position);
+            break;
+        case WHITE_ROOK:
+        case BLACK_ROOK:
+            return getMovesForRookAtPosition(position);
+            break;
+        case WHITE_QUEEN:
+        case BLACK_QUEEN:
+            return getMovesForQueenAtPosition(position);
+            break;
+        case WHITE_KING:
+        case BLACK_KING:
+            return getMovesForKingAtPosition(position);
+            break;
+        default:
+            throw std::invalid_argument("Unknown piece type");
+    }
+}
+uint64_t Board::getMovesForPawnAtPosition(std::string position)
+{
+    // Placeholder implementation
+    return 0;
+}
+uint64_t Board::getMovesForKnightAtPosition(std::string position)
+{
+    // Placeholder implementation
+    return 0;
+}
+uint64_t Board::getMovesForBishopAtPosition(std::string position)
+{
+    // Placeholder implementation
+    return 0;
+}
+uint64_t Board::getMovesForRookAtPosition(std::string position)
+{
+    // Placeholder implementation
+    return 0;
+}
+uint64_t Board::getMovesForQueenAtPosition(std::string position)
+{
+    // Placeholder implementation
+    return 0;
+}
+uint64_t Board::getMovesForKingAtPosition(std::string position)
+{
+    // Placeholder implementation
     return 0;
 }
 // === Basic Board Utilities ===
