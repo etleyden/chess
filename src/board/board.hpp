@@ -11,20 +11,21 @@
  * of pieces, turn management, and special rules like castling and en passant.
  */
 class Board {
-    // 64 bit representation of where each of
-    // these piece types are on the board.
-    uint64_t whitePawns;
-    uint64_t whiteKnights;
-    uint64_t whiteBishops;
-    uint64_t whiteRooks; 
-    uint64_t whiteQueens;
-    uint64_t whiteKing;
-    uint64_t blackPawns;
-    uint64_t blackKnights;
-    uint64_t blackBishops;
-    uint64_t blackRooks; 
-    uint64_t blackQueens;
-    uint64_t blackKing;
+    enum Piece {
+        WHITE_PAWN,
+        WHITE_KNIGHT,
+        WHITE_BISHOP,
+        WHITE_ROOK,
+        WHITE_QUEEN,
+        WHITE_KING,
+        BLACK_PAWN,
+        BLACK_KNIGHT,
+        BLACK_BISHOP,
+        BLACK_ROOK,
+        BLACK_QUEEN,
+        BLACK_KING
+    };
+    uint64_t pieces[12];
     // special rules
     bool whiteTurn; // is it white's turn?
     int castlingRights;  // can anyone castle?
@@ -38,6 +39,7 @@ class Board {
      * sets the turn to white, enables castling rights, and sets no en passant square.
      */
     Board();
+    uint64_t getMovesForPieceAtPosition(std::string position);
     /**
      * @brief Compares two rows on the chessboard.
      * 
@@ -61,7 +63,6 @@ class Board {
      */
     static int compareColumn(std::string position, char targetColumn);
     static int compareColumn(std::string position, int targetColumn);
-
 
     /**
      * @brief Generates a string representation of the current board state.

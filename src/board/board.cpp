@@ -2,18 +2,20 @@
 #include "board.hpp"
 
 Board::Board()
-    : whitePawns(0x000000000000FF00),
-      whiteKnights(0x0000000000000042),
-      whiteBishops(0x0000000000000024),
-      whiteRooks(0x0000000000000081),
-      whiteQueens(0x0000000000000008),
-      whiteKing(0x0000000000000010),
-      blackPawns(0x00FF000000000000),
-      blackKnights(0x4200000000000000),
-      blackBishops(0x2400000000000000),
-      blackRooks(0x8100000000000000),
-      blackQueens(0x0800000000000000),
-      blackKing(0x1000000000000000),
+    : pieces{
+          0x000000000000FF00, // WHITE_PAWN
+          0x0000000000000042, // WHITE_KNIGHT
+          0x0000000000000024, // WHITE_BISHOP
+          0x0000000000000081, // WHITE_ROOK
+          0x0000000000000008, // WHITE_QUEEN
+          0x0000000000000010, // WHITE_KING
+          0x00FF000000000000, // BLACK_PAWN
+          0x4200000000000000, // BLACK_KNIGHT
+          0x2400000000000000, // BLACK_BISHOP
+          0x8100000000000000, // BLACK_ROOK
+          0x0800000000000000, // BLACK_QUEEN
+          0x1000000000000000  // BLACK_KING
+      },
       whiteTurn(true),
       castlingRights(0b1111), // Both sides can castle both ways initially
       enPassantSquare(-1) // No en passant square initially
@@ -41,7 +43,16 @@ Board::Board()
  * used to play against a computer
  */
 // === Pieces and movement ===
+uint64_t Board::getMovesForPieceAtPosition(std::string position)
+{
 
+    // design requirements:
+    // a) validate position input
+    // b) identify piece at position
+    // c) if it is not their turn, throw an error
+    // d) generate valid moves for that piece based on current board state and store it in a bitmask
+    return 0;
+}
 // === Basic Board Utilities ===
 int Board::compareRow(std::string position, std::string targetRow)
 {
@@ -164,36 +175,35 @@ uint64_t Board::getBitmaskForColumn(int column)
     return bitmask;
 }
 // === Board Representation ===
-std::string Board::boardToString() const
-{
+std::string Board::boardToString() const {
     std::string boardRepresentation;
     for (int row = 7; row >= 0; --row) {
         for (int col = 0; col < 8; ++col) {
             uint64_t square = 1ULL << (row * 8 + col);
 
-            if (whitePawns & square) {
+            if (pieces[WHITE_PAWN] & square) {
                 boardRepresentation += 'P';
-            } else if (whiteKnights & square) {
+            } else if (pieces[WHITE_KNIGHT] & square) {
                 boardRepresentation += 'N';
-            } else if (whiteBishops & square) {
+            } else if (pieces[WHITE_BISHOP] & square) {
                 boardRepresentation += 'B';
-            } else if (whiteRooks & square) {
+            } else if (pieces[WHITE_ROOK] & square) {
                 boardRepresentation += 'R';
-            } else if (whiteQueens & square) {
+            } else if (pieces[WHITE_QUEEN] & square) {
                 boardRepresentation += 'Q';
-            } else if (whiteKing & square) {
+            } else if (pieces[WHITE_KING] & square) {
                 boardRepresentation += 'K';
-            } else if (blackPawns & square) {
+            } else if (pieces[BLACK_PAWN] & square) {
                 boardRepresentation += 'p';
-            } else if (blackKnights & square) {
+            } else if (pieces[BLACK_KNIGHT] & square) {
                 boardRepresentation += 'n';
-            } else if (blackBishops & square) {
+            } else if (pieces[BLACK_BISHOP] & square) {
                 boardRepresentation += 'b';
-            } else if (blackRooks & square) {
+            } else if (pieces[BLACK_ROOK] & square) {
                 boardRepresentation += 'r';
-            } else if (blackQueens & square) {
+            } else if (pieces[BLACK_QUEEN] & square) {
                 boardRepresentation += 'q';
-            } else if (blackKing & square) {
+            } else if (pieces[BLACK_KING] & square) {
                 boardRepresentation += 'k';
             } else {
                 // Determine if the square is light or dark
@@ -214,73 +224,73 @@ std::string Board::generateFEN() const {
         int emptyCount = 0;
         for (int file = 0; file < 8; ++file) {
             uint64_t square = 1ULL << (rank * 8 + file);
-            if (whitePawns & square) {
+            if (pieces[WHITE_PAWN] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'P';
-            } else if (whiteKnights & square) {
+            } else if (pieces[WHITE_KNIGHT] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'N';
-            } else if (whiteBishops & square) {
+            } else if (pieces[WHITE_BISHOP] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'B';
-            } else if (whiteRooks & square) {
+            } else if (pieces[WHITE_ROOK] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'R';
-            } else if (whiteQueens & square) {
+            } else if (pieces[WHITE_QUEEN] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'Q';
-            } else if (whiteKing & square) {
+            } else if (pieces[WHITE_KING] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'K';
-            } else if (blackPawns & square) {
+            } else if (pieces[BLACK_PAWN] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'p';
-            } else if (blackKnights & square) {
+            } else if (pieces[BLACK_KNIGHT] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'n';
-            } else if (blackBishops & square) {
+            } else if (pieces[BLACK_BISHOP] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'b';
-            } else if (blackRooks & square) {
+            } else if (pieces[BLACK_ROOK] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'r';
-            } else if (blackQueens & square) {
+            } else if (pieces[BLACK_QUEEN] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'q';
-            } else if (blackKing & square) {
+            } else if (pieces[BLACK_KING] & square) {
                 if (emptyCount > 0) {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
