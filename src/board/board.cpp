@@ -22,6 +22,13 @@ Board::Board()
 {
     // Constructor body can remain empty as initialization is done in the initializer list
 }
+Board::Board(std::string fen)
+    : pieces{0}, whiteTurn(true), castlingRights(0), enPassantSquare(-1)
+{
+    // Placeholder implementation for FEN parsing
+    // A full implementation would parse the FEN string and set up the board accordingly
+    throw std::invalid_argument("FEN parsing not yet implemented");
+}
 
 /**
  * === REQUIREMENTS ===
@@ -52,6 +59,14 @@ Board::Piece Board::getPieceAtPosition(std::string position)
         }
     }
     throw std::invalid_argument("No piece at the given position");
+}
+uint64_t Board::getBitmaskForBoard()
+{
+    uint64_t bitmask = 0;
+    for (int i = 0; i < 12; ++i) {
+        bitmask |= pieces[i];
+    }
+    return bitmask;
 }
 bool Board::getTurn()
 {

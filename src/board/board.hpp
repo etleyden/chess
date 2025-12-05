@@ -31,7 +31,8 @@ class Board {
         BLACK_BISHOP,
         BLACK_ROOK,
         BLACK_QUEEN,
-        BLACK_KING
+        BLACK_KING,
+        EMPTY
     };
     /**
      * @brief Constructs a new Board object with all pieces in their initial positions.
@@ -40,6 +41,10 @@ class Board {
      * sets the turn to white, enables castling rights, and sets no en passant square.
      */
     Board();
+    /**
+     * @brief Constructs a new Board object from a FEN string.
+     */
+    Board(std::string FEN);
     Piece getPieceAtPosition(std::string position);
     /**
      * @brief Returns a bitmask representing which squares are occupied on the board.

@@ -11,9 +11,16 @@
 
 namespace SimpleTest {
 
+enum class TestStatus {
+    NORMAL,
+    EXPECTED_FAIL,
+    SKIP
+};
+
 struct TestCase {
     std::string name;
     std::function<void()> func;
+    TestStatus status;
 };
 
 class TestRegistry {
@@ -23,44 +30,98 @@ public:
         return reg;
     }
     
-    void add(const std::string& name, std::function<void()> func) {
-        tests.push_back({name, func});
+    void add(const std::string& name, std::function<void()> func, TestStatus status = TestStatus::NORMAL) {
+        tests.push_back({name, func, status});
     }
     
     int run() {
         int passed = 0;
         int failed = 0;
+        int expected_fail = 0;
+        int unexpected_pass = 0;
+        int skipped = 0;
 
-        const std::string green = "\033[32m"; // Green color
-        const std::string red = "\033[31m";   // Red color
-        const std::string reset = "\033[0m";  // Reset color
+        const std::string green = "\033[32m";   // Green color
+        const std::string red = "\033[31m";     // Red color
+        const std::string yellow = "\033[33m";  // Yellow color
+        const std::string cyan = "\033[36m";    // Cyan color
+        const std::string reset = "\033[0m";    // Reset color
         
         std::cout << "Running " << tests.size() << " tests...\n\n";
         
         for (const auto& test : tests) {
+            if (test.status == TestStatus::SKIP) {
+                std::cout << cyan << "[ SKIP ] " << test.name << reset << std::endl;
+                skipped++;
+                continue;
+            }
+            
             std::cout << "[ RUN  ] " << test.name << std::endl;
+            
+            bool test_passed = false;
+            std::string error_msg;
+            
             try {
                 test.func();
-                std::cout << "[ PASS ] " << test.name << std::endl;
-                passed++;
+                test_passed = true;
             } catch (const std::exception& e) {
-                std::cout << "[ FAIL ] " << test.name << "\n  " << e.what() << std::endl;
-                failed++;
+                error_msg = e.what();
+                test_passed = false;
+            }
+            
+            if (test.status == TestStatus::EXPECTED_FAIL) {
+                if (test_passed) {
+                    std::cout << yellow << "[ UPASS] " << test.name << " (expected to fail, but passed)" << reset << std::endl;
+                    unexpected_pass++;
+                } else {
+                    std::cout << yellow << "[ XFAIL] " << test.name << reset << std::endl;
+                    if (!error_msg.empty()) {
+                        std::cout << "  " << error_msg << std::endl;
+                    }
+                    expected_fail++;
+                }
+            } else {
+                if (test_passed) {
+                    std::cout << green << "[ PASS ] " << test.name << reset << std::endl;
+                    passed++;
+                } else {
+                    std::cout << red << "[ FAIL ] " << test.name << reset << "\n  " << error_msg << std::endl;
+                    failed++;
+                }
             }
         }
         
         std::cout << "\n";
-        if(passed > 0) {
-            std::cout << green << passed << " passed" << reset << ", ";
+        std::cout << "=== Test Summary ===\n";
+        
+        if (passed > 0) {
+            std::cout << green << passed << " passed" << reset;
         } else {
-            std::cout << passed << " passed, ";
+            std::cout << passed << " passed";
         }
+        
         if (failed > 0) {
-            std::cout << red << failed << " failed" << reset << "\n";
+            std::cout << ", " << red << failed << " failed" << reset;
         } else {
-            std::cout << failed << " failed\n";
+            std::cout << ", " << failed << " failed";
         }
-        return failed;
+        
+        if (expected_fail > 0) {
+            std::cout << ", " << yellow << expected_fail << " expected failures" << reset;
+        }
+        
+        if (unexpected_pass > 0) {
+            std::cout << ", " << yellow << unexpected_pass << " unexpected passes" << reset;
+        }
+        
+        if (skipped > 0) {
+            std::cout << ", " << cyan << skipped << " skipped" << reset;
+        }
+        
+        std::cout << "\n";
+        
+        // Return non-zero if there are actual failures or unexpected passes
+        return failed + unexpected_pass;
     }
     
 private:
@@ -69,8 +130,8 @@ private:
 
 class TestRegistrar {
 public:
-    TestRegistrar(const std::string& name, std::function<void()> func) {
-        TestRegistry::instance().add(name, func);
+    TestRegistrar(const std::string& name, std::function<void()> func, TestStatus status = TestStatus::NORMAL) {
+        TestRegistry::instance().add(name, func, status);
     }
 };
 
@@ -171,6 +232,16 @@ void assert_throws(Callable func, const char* file, int line) {
     static SimpleTest::TestRegistrar registrar_##name(#name, test_##name); \
     void test_##name()
 
+#define TEST_XFAIL(name) \
+    void test_##name(); \
+    static SimpleTest::TestRegistrar registrar_##name(#name, test_##name, SimpleTest::TestStatus::EXPECTED_FAIL); \
+    void test_##name()
+
+#define TEST_SKIP(name) \
+    void test_##name(); \
+    static SimpleTest::TestRegistrar registrar_##name(#name, test_##name, SimpleTest::TestStatus::SKIP); \
+    void test_##name()
+
 #define ASSERT_EQ(expected, actual) \
     SimpleTest::assert_eq(expected, actual, __FILE__, __LINE__)
 
@@ -221,7 +292,33 @@ void assert_throws(Callable func, const char* file, int line) {
  *     ASSERT_THROWS(std::runtime_error, []() { throw std::runtime_error("Error"); });
  * }
  * 
+ * // Test that is expected to fail (not yet implemented)
+ * TEST_XFAIL(feature_not_implemented_yet) {
+ *     ASSERT_EQ(42, get_answer());  // get_answer() doesn't exist yet
+ * }
+ * 
+ * // Test that should be skipped
+ * TEST_SKIP(slow_integration_test) {
+ *     ASSERT_TRUE(run_slow_operation());
+ * }
+ * 
  * int main() {
  *     return RUN_ALL_TESTS();
  * }
+ * 
+ * OUTPUT EXAMPLE:
+ * Running 5 tests...
+ * 
+ * [ RUN  ] addition_works
+ * [ PASS ] addition_works
+ * [ RUN  ] comparisons
+ * [ PASS ] comparisons
+ * [ RUN  ] exception_test
+ * [ PASS ] exception_test
+ * [ RUN  ] feature_not_implemented_yet
+ * [ XFAIL] feature_not_implemented_yet
+ * [ SKIP ] slow_integration_test
+ * 
+ * === Test Summary ===
+ * 3 passed, 0 failed, 1 expected failures, 1 skipped
  */
