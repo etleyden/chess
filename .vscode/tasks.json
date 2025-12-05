@@ -2,35 +2,26 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Tests",
+            "label": "build-tests",
             "type": "shell",
-            "command": "g++",
+            "command": "C:/ProgramData/mingw64/mingw64/bin/g++.exe",
             "args": [
-                "-std=c++17",
-                "-Wall",
+                "-g",
+                "-std=c++23",
+                "-mconsole",
+                "-I${workspaceFolder}/src",           // Include src/ for chess.hpp
+                "-I${workspaceFolder}/src/board",     // Include src/board/ for board.hpp
+                "${file}",                             // Current test file
+                "${workspaceFolder}/src/board/board.cpp",  // All .cpp files
                 "-o",
-                "${workspaceFolder}/test/test.exe",
-                "${workspaceFolder}/test/test.cpp"
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["$gcc"]
-        },
-        {
-            "label": "Run Tests",
-            "type": "shell",
-            "command": "${workspaceFolder}/test/test.exe",
-            "dependsOn": ["Build Tests"],
-            "group": {
-                "kind": "test",
-                "isDefault": true
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            }
+            "problemMatcher": ["$gcc"],
+            "detail": "Build test with all source files"
         }
     ]
 }

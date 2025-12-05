@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <string>
 #include <cstdint>
 
@@ -33,6 +34,20 @@ class Board {
         BLACK_QUEEN,
         BLACK_KING,
         EMPTY
+    };
+    std::map<char, Piece> pieceMap = {
+        {'P', WHITE_PAWN},
+        {'N', WHITE_KNIGHT},
+        {'B', WHITE_BISHOP},
+        {'R', WHITE_ROOK},
+        {'Q', WHITE_QUEEN},
+        {'K', WHITE_KING},
+        {'p', BLACK_PAWN},
+        {'n', BLACK_KNIGHT},
+        {'b', BLACK_BISHOP},
+        {'r', BLACK_ROOK},
+        {'q', BLACK_QUEEN},
+        {'k', BLACK_KING}
     };
     /**
      * @brief Constructs a new Board object with all pieces in their initial positions.

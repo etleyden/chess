@@ -25,11 +25,89 @@ Board::Board()
 Board::Board(std::string fen)
     : pieces{0}, whiteTurn(true), castlingRights(0), enPassantSquare(-1)
 {
-    // Placeholder implementation for FEN parsing
-    // A full implementation would parse the FEN string and set up the board accordingly
-    throw std::invalid_argument("FEN parsing not yet implemented");
+    int position = 0;
+    enum FEN_PART
+    {
+        PIECES,
+        TURN,
+        CASTLING,
+        EN_PASSANT,
+        HALF_MOVE,
+        FULL_MOVE
+    };
+    FEN_PART currentPart = PIECES;
+    for (char c : fen)
+    {
+        if (currentPart == PIECES)
+        {
+            if (pieceMap.find(c) != pieceMap.end())
+            {
+                Piece piece = pieceMap[c];
+                pieces[piece] |= (1ULL << position);
+                position++;
+            }
+            else if (c >= '1' && c <= '8')
+            {
+                position += (c - '0');
+            }
+            else if (c == '/')
+            {
+                // do nothing, just a row separator
+            }
+            else if (c == ' ')
+            {
+                currentPart = TURN;
+            }
+        }
+        else if (currentPart == TURN)
+        {
+            if (c == 'w')
+            {
+                whiteTurn = true;
+            }
+            else if (c == 'b')
+            {
+                whiteTurn = false;
+            }
+            else if (c == ' ')
+            {
+                currentPart = CASTLING;
+            }
+            else
+            {
+                throw std::invalid_argument("Invalid FEN: Unknown turn character");
+            }
+        }
+        else if (currentPart == CASTLING)
+        {
+            // TODO: Handle castling rights parsing here
+            if (c == ' ')
+            {
+                currentPart = EN_PASSANT;
+            }
+        }
+        else if (currentPart == EN_PASSANT)
+        {
+            // TODO: Handle en passant square parsing here
+            if (c == ' ')
+            {
+                currentPart = HALF_MOVE;
+            }
+        }
+        else if (currentPart == HALF_MOVE)
+        {
+            // TODO: Handle half-move clock parsing here
+            if (c == ' ')
+            {
+                currentPart = FULL_MOVE;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
 }
-
 /**
  * === REQUIREMENTS ===
  * Move Handling Requirements
@@ -53,8 +131,10 @@ Board::Board(std::string fen)
 Board::Piece Board::getPieceAtPosition(std::string position)
 {
     uint64_t bitmask = getBitmaskForPosition(position);
-    for (int i = 0; i < 12; ++i) {
-        if (pieces[i] & bitmask) {
+    for (int i = 0; i < 12; ++i)
+    {
+        if (pieces[i] & bitmask)
+        {
             return static_cast<Piece>(i);
         }
     }
@@ -63,7 +143,8 @@ Board::Piece Board::getPieceAtPosition(std::string position)
 uint64_t Board::getBitmaskForBoard()
 {
     uint64_t bitmask = 0;
-    for (int i = 0; i < 12; ++i) {
+    for (int i = 0; i < 12; ++i)
+    {
         bitmask |= pieces[i];
     }
     return bitmask;
@@ -76,43 +157,46 @@ uint64_t Board::getMovesForPieceAtPosition(std::string position)
 {
     // design requirements:
     // a) validate position input
-    if(getBitmaskForPosition(position) == 0) {
+    if (getBitmaskForPosition(position) == 0)
+    {
         throw std::invalid_argument("Invalid position format");
     }
     // b) identify piece at position
     Piece piece = getPieceAtPosition(position);
     // c) if it is not their turn, throw an error
-    if ((whiteTurn && piece >= BLACK_PAWN) || (!whiteTurn && piece <= WHITE_KING)) {
+    if ((whiteTurn && piece >= BLACK_PAWN) || (!whiteTurn && piece <= WHITE_KING))
+    {
         throw std::invalid_argument("It's not that player's turn");
     }
     // d) generate valid moves for that piece based on current board state and store it in a bitmask
-    switch(piece) {
-        case WHITE_PAWN:
-        case BLACK_PAWN:
-            return getMovesForPawnAtPosition(position);
-            break;
-        case WHITE_KNIGHT:
-        case BLACK_KNIGHT:
-            return getMovesForKnightAtPosition(position);
-            break;
-        case WHITE_BISHOP:
-        case BLACK_BISHOP:
-            return getMovesForBishopAtPosition(position);
-            break;
-        case WHITE_ROOK:
-        case BLACK_ROOK:
-            return getMovesForRookAtPosition(position);
-            break;
-        case WHITE_QUEEN:
-        case BLACK_QUEEN:
-            return getMovesForQueenAtPosition(position);
-            break;
-        case WHITE_KING:
-        case BLACK_KING:
-            return getMovesForKingAtPosition(position);
-            break;
-        default:
-            throw std::invalid_argument("Unknown piece type");
+    switch (piece)
+    {
+    case WHITE_PAWN:
+    case BLACK_PAWN:
+        return getMovesForPawnAtPosition(position);
+        break;
+    case WHITE_KNIGHT:
+    case BLACK_KNIGHT:
+        return getMovesForKnightAtPosition(position);
+        break;
+    case WHITE_BISHOP:
+    case BLACK_BISHOP:
+        return getMovesForBishopAtPosition(position);
+        break;
+    case WHITE_ROOK:
+    case BLACK_ROOK:
+        return getMovesForRookAtPosition(position);
+        break;
+    case WHITE_QUEEN:
+    case BLACK_QUEEN:
+        return getMovesForQueenAtPosition(position);
+        break;
+    case WHITE_KING:
+    case BLACK_KING:
+        return getMovesForKingAtPosition(position);
+        break;
+    default:
+        throw std::invalid_argument("Unknown piece type");
     }
 }
 uint64_t Board::getMovesForPawnAtPosition(std::string position)
@@ -154,7 +238,7 @@ int Board::compareRow(std::string position, std::string targetRow)
     }
 
     int target = targetRow[0] - '0';
-    
+
     if (target <= 0 || target > 8)
     {
         throw std::invalid_argument("Invalid target row");
@@ -163,7 +247,8 @@ int Board::compareRow(std::string position, std::string targetRow)
 }
 int Board::compareRow(std::string position, int targetRow)
 {
-    if(position.length() < 2) {
+    if (position.length() < 2)
+    {
         throw std::invalid_argument("Invalid position format");
     }
     int posRow = position[1] - '0';
@@ -216,14 +301,16 @@ int Board::compareColumn(std::string position, int targetColumn)
 // === Bitmask Utils ===
 uint64_t Board::getBitmaskForPosition(std::string position)
 {
-    if (position.length() < 2) {
+    if (position.length() < 2)
+    {
         throw std::invalid_argument("Invalid position format");
     }
 
     char file = position[0];
     char rank = position[1];
 
-    if (file < 'a' || file > 'h' || rank < '1' || rank > '8') {
+    if (file < 'a' || file > 'h' || rank < '1' || rank > '8')
+    {
         throw std::invalid_argument("Position out of bounds");
     }
 
@@ -234,7 +321,8 @@ uint64_t Board::getBitmaskForPosition(std::string position)
 }
 uint64_t Board::getBitmaskForRow(int row)
 {
-    if (row < 1 || row > 8) {
+    if (row < 1 || row > 8)
+    {
         throw std::invalid_argument("Row out of bounds");
     }
 
@@ -242,7 +330,8 @@ uint64_t Board::getBitmaskForRow(int row)
 }
 uint64_t Board::getBitmaskForColumn(char column)
 {
-    if (column < 'a' || column > 'h') {
+    if (column < 'a' || column > 'h')
+    {
         throw std::invalid_argument("Column out of bounds");
     }
 
@@ -253,55 +342,88 @@ uint64_t Board::getBitmaskForColumn(char column)
 }
 uint64_t Board::getBitmaskForColumn(int column)
 {
-    if (column < 1 || column > 8) {
+    if (column < 1 || column > 8)
+    {
         throw std::invalid_argument("Column out of bounds");
     }
 
     uint64_t bitmask = 0;
     int colIndex = column - 1;
 
-    for (int row = 0; row < 8; ++row) {
+    for (int row = 0; row < 8; ++row)
+    {
         bitmask |= (1ULL << (row * 8 + colIndex));
     }
 
     return bitmask;
 }
 // === Board Representation ===
-std::string Board::boardToString() const {
+std::string Board::boardToString() const
+{
     std::string boardRepresentation;
-    for (int row = 7; row >= 0; --row) {
-        for (int col = 0; col < 8; ++col) {
+    for (int row = 7; row >= 0; --row)
+    {
+        for (int col = 0; col < 8; ++col)
+        {
             uint64_t square = 1ULL << (row * 8 + col);
 
-            if (pieces[WHITE_PAWN] & square) {
+            if (pieces[WHITE_PAWN] & square)
+            {
                 boardRepresentation += 'P';
-            } else if (pieces[WHITE_KNIGHT] & square) {
+            }
+            else if (pieces[WHITE_KNIGHT] & square)
+            {
                 boardRepresentation += 'N';
-            } else if (pieces[WHITE_BISHOP] & square) {
+            }
+            else if (pieces[WHITE_BISHOP] & square)
+            {
                 boardRepresentation += 'B';
-            } else if (pieces[WHITE_ROOK] & square) {
+            }
+            else if (pieces[WHITE_ROOK] & square)
+            {
                 boardRepresentation += 'R';
-            } else if (pieces[WHITE_QUEEN] & square) {
+            }
+            else if (pieces[WHITE_QUEEN] & square)
+            {
                 boardRepresentation += 'Q';
-            } else if (pieces[WHITE_KING] & square) {
+            }
+            else if (pieces[WHITE_KING] & square)
+            {
                 boardRepresentation += 'K';
-            } else if (pieces[BLACK_PAWN] & square) {
+            }
+            else if (pieces[BLACK_PAWN] & square)
+            {
                 boardRepresentation += 'p';
-            } else if (pieces[BLACK_KNIGHT] & square) {
+            }
+            else if (pieces[BLACK_KNIGHT] & square)
+            {
                 boardRepresentation += 'n';
-            } else if (pieces[BLACK_BISHOP] & square) {
+            }
+            else if (pieces[BLACK_BISHOP] & square)
+            {
                 boardRepresentation += 'b';
-            } else if (pieces[BLACK_ROOK] & square) {
+            }
+            else if (pieces[BLACK_ROOK] & square)
+            {
                 boardRepresentation += 'r';
-            } else if (pieces[BLACK_QUEEN] & square) {
+            }
+            else if (pieces[BLACK_QUEEN] & square)
+            {
                 boardRepresentation += 'q';
-            } else if (pieces[BLACK_KING] & square) {
+            }
+            else if (pieces[BLACK_KING] & square)
+            {
                 boardRepresentation += 'k';
-            } else {
+            }
+            else
+            {
                 // Determine if the square is light or dark
-                if ((row + col) % 2 == 1) {
+                if ((row + col) % 2 == 1)
+                {
                     boardRepresentation += 'X';
-                } else {
+                }
+                else
+                {
                     boardRepresentation += ' ';
                 }
             }
@@ -310,92 +432,134 @@ std::string Board::boardToString() const {
     }
     return boardRepresentation;
 }
-std::string Board::generateFEN() const {
+std::string Board::generateFEN() const
+{
     std::string fen;
-    for (int rank = 7; rank >= 0; --rank) {
+    for (int rank = 7; rank >= 0; --rank)
+    {
         int emptyCount = 0;
-        for (int file = 0; file < 8; ++file) {
+        for (int file = 0; file < 8; ++file)
+        {
             uint64_t square = 1ULL << (rank * 8 + file);
-            if (pieces[WHITE_PAWN] & square) {
-                if (emptyCount > 0) {
+            if (pieces[WHITE_PAWN] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'P';
-            } else if (pieces[WHITE_KNIGHT] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[WHITE_KNIGHT] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'N';
-            } else if (pieces[WHITE_BISHOP] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[WHITE_BISHOP] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'B';
-            } else if (pieces[WHITE_ROOK] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[WHITE_ROOK] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'R';
-            } else if (pieces[WHITE_QUEEN] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[WHITE_QUEEN] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'Q';
-            } else if (pieces[WHITE_KING] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[WHITE_KING] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'K';
-            } else if (pieces[BLACK_PAWN] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_PAWN] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'p';
-            } else if (pieces[BLACK_KNIGHT] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_KNIGHT] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'n';
-            } else if (pieces[BLACK_BISHOP] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_BISHOP] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'b';
-            } else if (pieces[BLACK_ROOK] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_ROOK] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'r';
-            } else if (pieces[BLACK_QUEEN] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_QUEEN] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'q';
-            } else if (pieces[BLACK_KING] & square) {
-                if (emptyCount > 0) {
+            }
+            else if (pieces[BLACK_KING] & square)
+            {
+                if (emptyCount > 0)
+                {
                     fen += std::to_string(emptyCount);
                     emptyCount = 0;
                 }
                 fen += 'k';
-            } else {
+            }
+            else
+            {
                 ++emptyCount;
             }
         }
-        if (emptyCount > 0) {
+        if (emptyCount > 0)
+        {
             fen += std::to_string(emptyCount);
         }
-        if (rank > 0) {
+        if (rank > 0)
+        {
             fen += '/';
         }
     }
@@ -403,10 +567,14 @@ std::string Board::generateFEN() const {
     fen += whiteTurn ? " w " : " b ";
 
     std::string castling = "";
-    if (castlingRights & 0b1000) castling += "K";
-    if (castlingRights & 0b0100) castling += "Q";
-    if (castlingRights & 0b0010) castling += "k";
-    if (castlingRights & 0b0001) castling += "q";
+    if (castlingRights & 0b1000)
+        castling += "K";
+    if (castlingRights & 0b0100)
+        castling += "Q";
+    if (castlingRights & 0b0010)
+        castling += "k";
+    if (castlingRights & 0b0001)
+        castling += "q";
     fen += castling.empty() ? "-" : castling;
 
     fen += " ";
