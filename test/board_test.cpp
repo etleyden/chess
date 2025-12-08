@@ -165,6 +165,9 @@ TEST(fen_notation_2_Nf3) {
     ASSERT_EQ(Board::Piece::EMPTY, board.getPieceAtPosition("g1"));
     ASSERT_EQ(Board::Piece::WHITE_KNIGHT, board.getPieceAtPosition("f3"));
 }
+// movement tests. Tests utilize getMovesForPieceAtPosition, which will 
+// implicitly test piece specific movement functions as well
+// === PAWN MOVEMENT ===
 int main()
 {
     return RUN_ALL_TESTS();
