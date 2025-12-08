@@ -12,7 +12,7 @@
  * of pieces, turn management, and special rules like castling and en passant.
  */
 class Board {
-    
+    // each bitboard is big endian, where the most significant bit is a8 and the least significant bit is h1
     uint64_t pieces[12];
     // special rules
     bool whiteTurn; // is it white's turn?

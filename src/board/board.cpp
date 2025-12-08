@@ -25,7 +25,8 @@ Board::Board()
 Board::Board(std::string fen)
     : pieces{0}, whiteTurn(true), castlingRights(0), enPassantSquare(-1)
 {
-    int position = 0;
+    int rank = 7;
+    int file = 0;
     enum FEN_PART
     {
         PIECES,
@@ -42,17 +43,19 @@ Board::Board(std::string fen)
         {
             if (pieceMap.find(c) != pieceMap.end())
             {
+                int position = rank * 8 + file;
                 Piece piece = pieceMap[c];
                 pieces[piece] |= (1ULL << position);
-                position++;
+                file++;
             }
             else if (c >= '1' && c <= '8')
             {
-                position += (c - '0');
+                file += (c - '0');
             }
             else if (c == '/')
             {
-                // do nothing, just a row separator
+                rank--;
+                file = 0;
             }
             else if (c == ' ')
             {
@@ -138,7 +141,7 @@ Board::Piece Board::getPieceAtPosition(std::string position)
             return static_cast<Piece>(i);
         }
     }
-    throw std::invalid_argument("No piece at the given position");
+    return EMPTY;
 }
 uint64_t Board::getBitmaskForBoard()
 {
