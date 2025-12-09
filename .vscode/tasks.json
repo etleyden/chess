@@ -9,10 +9,10 @@
                 "-g",
                 "-std=c++23",
                 "-mconsole",
-                "-I${workspaceFolder}/src",           // Include src/ for chess.hpp
-                "-I${workspaceFolder}/src/board",     // Include src/board/ for board.hpp
-                "${file}",                             // Current test file
-                "${workspaceFolder}/src/board/board.cpp",  // All .cpp files
+                "-I${workspaceFolder}/src",
+                "-I${workspaceFolder}/src/board",
+                "${file}",
+                "${workspaceFolder}/src/board/board.cpp",
                 "-o",
                 "${fileDirname}\\${fileBasenameNoExtension}.exe"
             ],
@@ -21,7 +21,34 @@
                 "isDefault": true
             },
             "problemMatcher": ["$gcc"],
-            "detail": "Build test with all source files"
+            "detail": "Build test with all source files (Windows)",
+            "windows": {
+                "command": "C:/ProgramData/mingw64/mingw64/bin/g++.exe",
+                "args": [
+                    "-g",
+                    "-std=c++23",
+                    "-mconsole",
+                    "-I${workspaceFolder}/src",
+                    "-I${workspaceFolder}/src/board",
+                    "${file}",
+                    "${workspaceFolder}/src/board/board.cpp",
+                    "-o",
+                    "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                ]
+            },
+            "linux": {
+                "command": "/usr/bin/g++",
+                "args": [
+                    "-g",
+                    "-std=c++23",
+                    "-I${workspaceFolder}/src",
+                    "-I${workspaceFolder}/src/board",
+                    "${file}",
+                    "${workspaceFolder}/src/board/board.cpp",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}"
+                ]
+            }
         }
     ]
 }

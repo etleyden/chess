@@ -12,6 +12,7 @@
 | Task | Command |
 |------|---------|
 | **Initial Build (Windows using g++)** | `cmake -S . -B build -G "MinGW Makefiles"` |
+| **Initial Build (Arch Linux using g++)** | `cmake -S . -B build -G "Unix Makefiles"`|
 | **Simple Build** | `cmake --build build` |
 | **Build and run tests:** | `cmake --build build --target run_tests` |
 |**Install the library \[untested\]:** | `cmake --install build --prefix /usr/local`|
