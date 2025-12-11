@@ -16,7 +16,7 @@
 | **Simple Build** | `cmake --build build` |
 | **Build and run tests:** | `cmake --build build --target run_tests` |
 |**Install the library \[untested\]:** | `cmake --install build --prefix /usr/local`|
-|**Clean up build artifacts:** | `cmake --build build --target clean`|
+|**Clean up build artifacts \[untested\]:** | `cmake --build build --target clean`|
 
 ## Current Implementation Plan
 
